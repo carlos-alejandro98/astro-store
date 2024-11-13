@@ -1,4 +1,5 @@
-import { defineAction, z } from 'astro:actions';
+import { defineAction} from 'astro:actions';
+import { z } from 'zod';
 
 export const loginUser = defineAction({
   accept: 'form',
