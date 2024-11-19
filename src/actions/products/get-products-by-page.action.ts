@@ -3,7 +3,7 @@ import { defineAction } from 'astro:actions';
 import { count, db, eq, Product, ProductImage, sql } from 'astro:db';
 import { z } from 'zod';
 
-export const getProductByPage = defineAction({
+export const getProductsByPage = defineAction({
     accept: 'json',
     input: z.object({
         page: z.number().optional().default(1),
