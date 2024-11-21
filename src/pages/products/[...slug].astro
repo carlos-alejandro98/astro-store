@@ -5,7 +5,10 @@ import { actions } from "astro:actions";
 
 const { slug } = Astro.params;
 
-const { data, error } = await Astro.callAction(actions.getProductBySlug, slug ?? "");
+const { data, error } = await Astro.callAction(
+    actions.getProductBySlug,
+    slug ?? "",
+);
 
 if (error) {
     return Astro.redirect("/404");
@@ -38,7 +41,8 @@ const { product, images } = data;
                 <button class="btn-quantity">+</button>
             </div>
 
-            <button class="mt-5 bg-blue-500 text-white p-3 w-full disabled:bg-gray-500"
+            <button
+                class="mt-5 bg-blue-500 text-white p-3 w-full disabled:bg-gray-500"
                 >Añadir al carrito</button
             >
 
@@ -51,7 +55,8 @@ const { product, images } = data;
 </MainLayout>
 
 <script>
-import { CartCookiesClient } from "@/utils";
+    import { itemsInCart } from "@/store";
+    import { CartCookiesClient } from "@/utils";
 
     // Seleccionar la talla
     const sizeElements = document.querySelectorAll("li");
@@ -92,17 +97,18 @@ import { CartCookiesClient } from "@/utils";
             return alert("Selecciona una talla");
         }
 
-        addToCartButton.disabled = true;
+        //addToCartButton.disabled = true;
 
-        CartCookiesClient.addItem({
+        const cart = CartCookiesClient.addItem({
             productId: productIdInput.value,
             size: size,
             quantity: quantity,
         });
 
+        itemsInCart.set(cart.length);
 
         //TODO cambiar luego cuando tengamos los viewTransitions
-        window.location.href = "/cart";
+        //window.location.href = "/cart";
     });
 </script>
 
