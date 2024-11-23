@@ -23,6 +23,9 @@ const { product, images } = data;
     <a href="javascript:history.back()" class="text-blue-500">← Volver</a>
 
     <form class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <input type="hidden" name="id" value={product.id} />
+
         <!-- Datos generales -->
         <div class="mt-2">
             <h2 class="text-lg font-semibold">Datos generales</h2>
@@ -282,35 +285,41 @@ const { product, images } = data;
     </style>
 </MainLayout>
 
-
 <script>
+    import { actions } from "astro:actions";
+import { navigate } from "astro:transitions/client";
 
-    document.addEventListener('astro:page-load', () => {
+    document.addEventListener("astro:page-load", () => {
+        const form = document.querySelector("form") as HTMLFormElement;
 
-        const form = document.querySelector('form') as HTMLFormElement;
+        const sizeButtons = document.querySelectorAll(".btn-size");
 
-        const sizeButtons = document.querySelectorAll('.btn-size');
-
-        if ( !form ){
+        if (!form) {
             return;
         }
 
-        form.addEventListener('submit', async (e) => {
+        form.addEventListener("submit", async (e) => {
             e.preventDefault();
 
             const selectedSizes = Array.from(sizeButtons)
-                .filter((btn) => btn.classList.contains('active'))
+                .filter((btn) => btn.classList.contains("active"))
                 .map((btn) => btn.textContent?.trim())
-                .join(','); // XS,S,M,L
+                .join(","); // XS,S,M,L
 
             const formData = new FormData(form);
-            formData.set('sizes', selectedSizes);
+            formData.set("sizes", selectedSizes);
 
-            const formValues = Object.fromEntries(formData.entries());;
+            const formValues = Object.fromEntries(formData.entries());
 
             console.log(formValues);
 
-        });
-    })
+            const { data, error } = await actions.createUpdateProduct(formData);
 
+            if (error) {
+                return alert(error.message);
+            }
+
+            navigate(`/admin/products/${data.slug}`);
+        });
+    });
 </script>
