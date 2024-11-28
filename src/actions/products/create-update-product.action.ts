@@ -3,7 +3,8 @@ import { defineAction } from 'astro:actions';
 import { getSession } from 'auth-astro/server';
 import { z } from 'zod';
 import { v4 as UUID } from 'uuid';
-import { db, eq, Product } from 'astro:db';
+import { db, eq, Product, ProductImage } from 'astro:db';
+import { ImageUpload } from '@/utils/image-upload';
 
 const MAX_FILE_SIZE = 5_000_000; // 5MB
 const ACCEPTED_IMAGE_TYPES = [
@@ -32,10 +33,10 @@ export const createUpdateProduct = defineAction({
             z.instanceof(File)
                 .refine(file => file.size <= MAX_FILE_SIZE, 'Max image size 5MB')
                 .refine(file => {
-                    if( file.size === 0 ) return true;
-                    
+                    if (file.size === 0) return true;
+
                     return ACCEPTED_IMAGE_TYPES.includes(file.type);
-                }, `Only supported image files are valid, ${ACCEPTED_IMAGE_TYPES.join(',')}` )
+                }, `Only supported image files are valid, ${ACCEPTED_IMAGE_TYPES.join(',')}`)
         ).optional(),
     }),
     handler: async (form, { request }) => {
@@ -45,7 +46,7 @@ export const createUpdateProduct = defineAction({
 
         //Podemos validar si el usuario tiene permisos para realizar esta acción
 
-        if (!user) {
+        if (!user || user.role !== 'admin') {
             throw new Error('Unauthorized');
         }
 
@@ -58,14 +59,58 @@ export const createUpdateProduct = defineAction({
             ...rest
         };
 
+
+        const queries: any = []
+
         if (!form.id) {
-            await db.insert(Product).values(product);
+            queries.push(
+                db.insert(Product).values(product)
+            );
         } else {
-            await db.update(Product).set(product).where(eq(Product.id, id));
+            queries.push(
+                await db.update(Product).set(product).where(eq(Product.id, id))
+            );
         }
 
         // Imagenes
-        console.log({imageFiles});
+        const secureUrls: string[] = [];
+        if (
+            form.imageFiles && 
+            form.imageFiles.length > 0 && 
+            form.imageFiles[0].size > 0
+        ) {
+
+            const urls = await Promise.all(
+                form.imageFiles.map( (file) => ImageUpload.upload(file))
+            );
+
+            secureUrls.push(...urls);
+        }
+
+        secureUrls.forEach( (imageUrl) => {
+            const imageObj = {
+                id: UUID(),
+                image: imageUrl,
+                productId: product.id,
+            }
+
+            queries.push(
+                db.insert(ProductImage).values(imageObj)
+            );
+        });
+
+        /* 
+            Refactorizado arriba
+            imageFiles?.forEach(async image => {
+                if (image.size === 0) return;
+
+                const url = await ImageUpload.upload(image);
+            }); 
+        */
+
+
+        await db.batch(queries);
+
 
         return product;
     }
