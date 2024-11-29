@@ -233,6 +233,7 @@ const { product, images } = data;
                             type="file"
                             accept="image/*"
                             multiple
+                            class="hidden"
                         />
                     </label>
                 </div>
@@ -325,14 +326,12 @@ const { product, images } = data;
             navigate(`/admin/products/${data.slug}`);
         });
 
-
         // Delete images
         const btnsDeleteImages = document.querySelectorAll(".btn-delete-image");
 
         btnsDeleteImages.forEach((btn) => {
             btn.addEventListener("click", async (e) => {
-                
-                const id = btn.getAttribute("data-id") ?? '';
+                const id = btn.getAttribute("data-id") ?? "";
 
                 if (!id) return;
 
@@ -341,11 +340,77 @@ const { product, images } = data;
                 if (error) {
                     return alert(error.message);
                 }
-                
-                document.querySelector(`tr[id="${id}"]`)?.remove();
 
+                document.querySelector(`tr[id="${id}"]`)?.remove();
             });
         });
 
+        // Drag and drop
+        const lblSelectedFiles = document.getElementById(
+            "lbl-selected-files",
+        ) as HTMLParagraphElement;
+        const dropZone = document.getElementById(
+            "drop-zone",
+        ) as HTMLLabelElement;
+        const fileInput = document.getElementById(
+            "file-upload",
+        ) as HTMLInputElement;
+
+        const preventDefaults = (e: DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        const highlight = (e: DragEvent) => {
+            dropZone.classList.add("border-blue-500", "bg-blue-50");
+        };
+
+        const unHighlight = (e: DragEvent) => {
+            dropZone.classList.remove("border-blue-500", "bg-blue-50");
+        };
+
+        const createFileList = (files: File[]) => {
+            const dataTranfer = new DataTransfer();
+            files.forEach((file) => dataTranfer.items.add(file));
+            return dataTranfer.files;
+        };
+
+        const handleFiles = (files: FileList) => {
+            const validFiles = Array.from(files).filter((file) =>
+                file.type.startsWith("image/")
+            );
+
+            if( fileInput && validFiles.length > 0) {
+                fileInput.files = createFileList(validFiles);
+            } else {
+                alert("Solo se permiten imagenes");
+            }
+
+            lblSelectedFiles.textContent = `${validFiles.length} archivos seleccionados`;
+        };
+
+        (["dragenter", "dragover", "dragleave", "drop"] as const).forEach(
+            (eventName) => {
+                dropZone.addEventListener(eventName, preventDefaults);
+                document.body.addEventListener(eventName, preventDefaults);
+            },
+        );
+
+        (["dragenter", "dragover"] as const).forEach((eventName) => {
+            dropZone.addEventListener(eventName, highlight);
+        });
+
+        (["dragleave", "drop"] as const).forEach((eventName) => {
+            dropZone.addEventListener(eventName, unHighlight);
+        });
+
+        // Solo imagenes
+        dropZone.addEventListener("drop", (e: DragEvent) => {
+            const files = e.dataTransfer?.files;
+
+            if (files) {
+                handleFiles(files);
+            }
+        });
     });
 </script>
