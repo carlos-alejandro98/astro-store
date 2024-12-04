@@ -330,7 +330,7 @@ const { product, images } = data;
         const btnsDeleteImages = document.querySelectorAll(".btn-delete-image");
 
         btnsDeleteImages.forEach((btn) => {
-            btn.addEventListener("click", async (e) => {
+            btn.addEventListener("click", async () => {
                 const id = btn.getAttribute("data-id") ?? "";
 
                 if (!id) return;
@@ -361,11 +361,11 @@ const { product, images } = data;
             e.stopPropagation();
         };
 
-        const highlight = (e: DragEvent) => {
+        const highlight = () => {
             dropZone.classList.add("border-blue-500", "bg-blue-50");
         };
 
-        const unHighlight = (e: DragEvent) => {
+        const unHighlight = () => {
             dropZone.classList.remove("border-blue-500", "bg-blue-50");
         };
 

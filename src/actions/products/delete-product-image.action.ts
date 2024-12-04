@@ -25,7 +25,7 @@ export const deleteProductImage = defineAction({
             throw new Error(`Image with id ${imageId} not found`);
         }
 
-        const deleted = await db.delete(ProductImage).where(eq(ProductImage.id, imageId));
+        //const deleted = await db.delete(ProductImage).where(eq(ProductImage.id, imageId));
 
         if (productImage.image.includes('http')) {
             await ImageUpload.delete(productImage.image);

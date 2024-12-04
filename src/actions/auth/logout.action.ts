@@ -1,4 +1,4 @@
-import { defineAction, z } from 'astro:actions';
+import { defineAction } from 'astro:actions';
 
 export const logout = defineAction({
   accept: 'json',
