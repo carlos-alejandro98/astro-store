@@ -139,8 +139,6 @@ import AuthLayout from '@/layouts/AuthLayout.astro';
         return;
       }
 
-      bntGoogle.innerText = 'Redireccionando...';
-      window.location.replace('/protected');
     } catch (error) {
       console.log(error);
       bntGoogle.removeAttribute('disabled');
