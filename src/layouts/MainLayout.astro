@@ -2,7 +2,7 @@
 import Navbar from "@/components/shared/Navbar.astro";
 
 import "@/assets/styles/globals.css";
-import { ClientRouter } from "astro:transitions";
+import { ViewTransitions } from "astro:transitions";
 
 interface Props {
   title?: string;
@@ -21,7 +21,7 @@ const { title = "Astro Store" } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
-    <ClientRouter />
+    <ViewTransitions />
   </head>
   <body>
     <Navbar />
