@@ -44,6 +44,9 @@ export const createUpdateProduct = defineAction({
         const session = await getSession(request);
         const user = session?.user;
 
+        console.log('User:', user);
+        console.log('Role:', user?.role);
+
         //Podemos validar si el usuario tiene permisos para realizar esta acción
 
         if (!user || user.role !== 'admin') {
@@ -98,16 +101,6 @@ export const createUpdateProduct = defineAction({
                 db.insert(ProductImage).values(imageObj)
             );
         });
-
-        /* 
-            Refactorizado arriba
-            imageFiles?.forEach(async image => {
-                if (image.size === 0) return;
-
-                const url = await ImageUpload.upload(image);
-            }); 
-        */
-
 
         await db.batch(queries);
 

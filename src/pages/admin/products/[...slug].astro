@@ -320,7 +320,9 @@ const { product, images } = data;
             const { data, error } = await actions.createUpdateProduct(formData);
 
             if (error) {
-                return alert(error.message);
+                //refrescar la pagina
+                window.location.reload();
+                return;
             }
 
             navigate(`/admin/products/${data.slug}`);
