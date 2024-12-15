@@ -7,7 +7,7 @@ import AuthLayout from '@/layouts/AuthLayout.astro';
     <div class="p-12 bg-white mx-auto rounded-2xl w-100">
       <div class="mb-4">
         <h3 class="font-semibold text-2xl text-gray-800">Registro</h3>
-        <p class="text-gray-500">Please sign in to your account.</p>
+        <p class="text-gray-500">Ingrese los datos solicitados.</p>
       </div>
       <form class="space-y-5">
         <div class="space-y-2">
@@ -67,13 +67,13 @@ import AuthLayout from '@/layouts/AuthLayout.astro';
             id="btn-submit"
             class="disabled:bg-gray-300 w-full flex justify-center bg-green-400 hover:bg-green-500 text-gray-100 p-3 rounded-full tracking-wide font-semibold shadow-lg cursor-pointer transition ease-in duration-500"
           >
-            Ingresar
+            Crear
           </button>
         </div>
       </form>
       <div class="pt-5 text-center text-gray-400 text-xs">
         <span>
-          Copyright © 2021-{new Date().getFullYear()}
+          Copyright © {new Date().getFullYear()}
           <a
             href="https://codepen.io/uidesignhub"
             rel=""
@@ -100,7 +100,7 @@ import AuthLayout from '@/layouts/AuthLayout.astro';
 
     const formData = new FormData(form);
 
-    const { error } = await Astro.callAction(actions.registerUser, formData);
+    const { error } = await actions.registerUser(formData);
 
     if (error) {
       Swal.fire({
